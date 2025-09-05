@@ -1,0 +1,23 @@
+{
+  "name": "line-stamp-api-proxy",
+  "version": "0.1.0",
+  "module": "src/main.ts",
+  "type": "module",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "start": "bun run src/main.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "hono": "^4.9.6",
+    "ky": "^1.9.1",
+    "log4js": "^6.9.1",
+    "yaml": "^2.8.1"
+  }
+}

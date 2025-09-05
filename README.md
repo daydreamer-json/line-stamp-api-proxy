@@ -1,10 +1,14 @@
 ---
-title: Line Stamp Api Proxy
-emoji: 🔥
-colorFrom: green
-colorTo: red
+title: Proxy Server for LINE Store API and CDN
+emoji: 🐧
+colorFrom: blue
+colorTo: purple
 sdk: docker
-pinned: false
+app_port: 3000
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+# line-stamp-api-proxy
+
+Proxy server for LINE store API and CDN.
+
+For educational and research purposes only.

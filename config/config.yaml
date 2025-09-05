@@ -1,0 +1,15 @@
+request_timeout: 30000
+log4js:
+  appenders:
+    console:
+      type: console
+      layout:
+        type: pattern
+        pattern: "%[%d{hh:mm:ss.SSS} %-5.0p >%] %m"
+  categories:
+    default:
+      appenders: ["console"]
+      level: trace
+userAgent:
+  chromeWindows: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
+  lineIos: "LINE/2025.729.2024 CFNetwork/3859.100.1 Darwin/25.0.0"
