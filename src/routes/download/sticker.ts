@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import ky from 'ky';
+import fs from 'fs';
+import { exec } from 'child_process';
 import { logger } from '../../utils/logger';
 import { loadConfig } from '../../utils/config';
 
@@ -69,6 +71,7 @@ app.get('/single/:stickerId', async (c) => {
   const deviceType: DeviceType = (c.req.query('device_type') || 'ios') as DeviceType;
   const isStaticFlag: boolean = c.req.query('is_static') === 'true' || false;
   const variantSize: number = parseInt(c.req.query('size') || '2');
+  const gifFlag: boolean = c.req.query('gif') === 'true';
 
   if (stickerId === -1) return c.text('Invalid stickerId', 400);
   if (!validDeviceTypes.includes(deviceType as DeviceType)) return c.text('Invalid device_type', 400);
@@ -86,6 +89,43 @@ app.get('/single/:stickerId', async (c) => {
       },
     );
 
+    // GIF変換が必要な場合（アニメーションの場合のみ）
+    if (gifFlag && !isStaticFlag) {
+      const buffer = await response.arrayBuffer();
+      const prefix = Math.random().toString(36).substring(2);
+      const inputPath = `tmp_${prefix}_input.png`;
+      const outputPath = `tmp_${prefix}_output.gif`;
+
+      fs.writeFileSync(inputPath, Buffer.from(buffer));
+
+      // FFmpegでAPNGをGIFに変換
+      await new Promise<void>((resolve, reject) => {
+        exec(
+          `ffmpeg -y -i ${inputPath} -loop 0 -filter_complex "[0:v] split [a][b];[a] palettegen [p];[b][p] paletteuse=dither=floyd_steinberg" ${outputPath}`,
+          (error) => {
+            if (error) reject(error);
+            else resolve();
+          },
+        );
+      });
+
+      const gifBuffer = fs.readFileSync(outputPath);
+
+      // 一時ファイルをクリーンアップ
+      fs.unlink(inputPath, () => {});
+      fs.unlink(outputPath, () => {});
+
+      const filteredHeaders = new Headers();
+      filteredHeaders.set('Content-Type', 'image/gif');
+      filteredHeaders.set('X-Origin-Date', response.headers.get('Date')!);
+
+      return new Response(gifBuffer, {
+        status: 200,
+        headers: filteredHeaders,
+      });
+    }
+
+    // 通常の場合
     const allowedHeaders = ['Content-Type', 'ETag', 'Cache-Control', 'Last-Modified'];
     const filteredHeaders = new Headers();
     allowedHeaders.forEach((header) => {

@@ -23,7 +23,8 @@ COPY . .
 # ポートを公開（Hugging Face Spacesではapp_port設定と合わせる）
 EXPOSE 3000
 
-RUN  bun install --production \
+RUN apk add --no-cache ffmpeg \
+  && bun install --production \
   && bun pm cache rm \
   && chmod -R 777 /app
 
