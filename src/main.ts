@@ -59,7 +59,9 @@ Example:
 - /api/download/sticker/single/23214968?device_type=android&is_static=false&size=1
 - /api/download/sticker/thumb/18537?device_type=ios
 - /api/download/sticker/sound/single/350279022?device_type=ios
-- /api/download/sticker/sound/thumb/18537?device_type=ios`,
+- /api/download/sticker/sound/thumb/18537?device_type=ios
+
+More info: /docs`,
     200,
     {
       'Content-Type': 'text/plain',
@@ -75,11 +77,13 @@ import searchRoutes from './routes/search';
 import metaRoutes from './routes/meta';
 import stickerRoutes from './routes/download/sticker';
 import emojiRoutes from './routes/download/emoji';
+import docsRoutes from './routes/docs';
 
 apiRoutes.route('/search', searchRoutes);
 apiRoutes.route('/meta', metaRoutes);
 apiRoutes.route('/download/sticker', stickerRoutes);
 apiRoutes.route('/download/emoji', emojiRoutes);
+app.route('/docs', docsRoutes);
 
 // サーバー起動
 const port = process.env.PORT || 3000;
