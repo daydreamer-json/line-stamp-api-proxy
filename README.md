@@ -12,3 +12,7 @@ app_port: 3000
 Proxy server for LINE store API and CDN.
 
 For educational and research purposes only.
+
+## API Documentation
+
+Please refer to [API.md](API.md).
