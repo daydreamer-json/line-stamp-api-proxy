@@ -45,6 +45,7 @@ app.use('*', async (c, next) => {
 
 // ベースルート
 app.get('/', (c) => {
+  const baseDomain = new URL(c.req.url).host;
   return c.text(
     `Proxy Server for LINE Store API and CDN
 by daydreamer-json
@@ -52,6 +53,8 @@ by daydreamer-json
 This server is powered by penguins uwu (and Hono)
 
 ---
+
+Base Domain: ${baseDomain}
 
 Example:
 - /api/search?category=sticker&type=ALL&query=koupen&offset=0&limit=1
