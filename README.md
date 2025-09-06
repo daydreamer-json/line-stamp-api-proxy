@@ -9,6 +9,8 @@ app_port: 3000
 
 # line-stamp-api-proxy
 
+![logo](assets/opengraph_2560x1280.png)
+
 Proxy server for LINE store API and CDN.
 
 For educational and research purposes only.
