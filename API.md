@@ -2,7 +2,8 @@
 
 This proxy server provides endpoints to access LINE Store API and CDN resources.
 
-Base URL: `http://localhost:3000` (replace with your actual server URL)
+Base URL: `http://localhost:3000` (replace with your actual server URL)  
+Demo server URL: `https://daydreamer-json-line-stamp-api-proxy.hf.space`
 
 ## Root Endpoint
 
