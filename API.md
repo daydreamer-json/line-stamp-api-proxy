@@ -222,3 +222,49 @@ Download the thumbnail image for an emoji product.
 
 - `productId`: string (hexadecimal)
   - Emoji product ID
+
+---
+
+## Get Product JSON-LD Metadata
+
+Get JSON-LD metadata from LINE Store web pages.
+
+### Sticker Web Metadata
+
+`GET /sticker/:productId`
+
+Get JSON-LD metadata for a sticker product from the LINE Store web page.
+
+#### Path Parameters
+
+- `productId`: number (integer)
+  - Sticker product ID
+
+#### Headers
+
+- `Accept-Language`: string (optional)
+  - Language preference for the web page (e.g., 'ja', 'en', 'ko'). Defaults to 'ja' if not provided.
+
+#### Response
+
+Returns the JSON-LD metadata found in the web page's `<head>` section.
+
+### Emoji Web Metadata
+
+`GET /emoji/:productId`
+
+Get JSON-LD metadata for an emoji product from the LINE Store web page.
+
+#### Path Parameters
+
+- `productId`: string (hexadecimal)
+  - Emoji product ID (hexadecimal string)
+
+#### Headers
+
+- `Accept-Language`: string (optional)
+  - Language preference for the web page (e.g., 'ja', 'en', 'ko'). Defaults to 'ja' if not provided.
+
+#### Response
+
+Returns the JSON-LD metadata found in the web page's `<head>` section.
