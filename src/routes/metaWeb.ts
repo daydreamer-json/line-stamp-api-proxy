@@ -12,7 +12,7 @@ const app = new Hono();
 app.get('/sticker/:productId', async (c) => {
   const productId: number = parseInt(c.req.param('productId') || '-1');
   if (productId === -1) return c.text('Invalid productId', 400);
-  const preferredLanguage = c.req.header('Accept-Language') || 'ja';
+  const preferredLanguage = c.req.query('lang') ?? (c.req.header('Accept-Language') || 'ja');
 
   try {
     const response = await ky(`https://store.line.me/stickershop/product/${productId}/${preferredLanguage}`, {
@@ -46,7 +46,7 @@ app.get('/sticker/:productId', async (c) => {
 app.get('/emoji/:productId', async (c) => {
   const productId: string = c.req.param('productId') || 'null';
   if (!/^[0-9a-f]+$/.test(productId)) return c.text('Invalid productId', 400);
-  const preferredLanguage = c.req.header('Accept-Language') || 'ja';
+  const preferredLanguage = c.req.query('lang') ?? (c.req.header('Accept-Language') || 'ja');
 
   try {
     const response = await ky(`https://store.line.me/emojishop/product/${productId}/${preferredLanguage}`, {
