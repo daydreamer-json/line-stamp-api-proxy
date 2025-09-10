@@ -78,12 +78,14 @@ const apiRoutes = app.basePath('/api');
 // ルートを登録
 import searchRoutes from './routes/search';
 import metaRoutes from './routes/meta';
+import metaWebRoutes from './routes/metaWeb';
 import stickerRoutes from './routes/download/sticker';
 import emojiRoutes from './routes/download/emoji';
 import docsRoutes from './routes/docs';
 
 apiRoutes.route('/search', searchRoutes);
 apiRoutes.route('/meta', metaRoutes);
+apiRoutes.route('/meta_web', metaWebRoutes);
 apiRoutes.route('/download/sticker', stickerRoutes);
 apiRoutes.route('/download/emoji', emojiRoutes);
 app.route('/docs', docsRoutes);
