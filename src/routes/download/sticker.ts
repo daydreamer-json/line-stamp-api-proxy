@@ -288,4 +288,81 @@ app.get('/sound/thumb/:productId', async (c) => {
   }
 });
 
+// SOUND+(ANIMATION or STATIC) 動画化ダウンロードエンドポイント
+app.get('/mp4/single/:stickerId', async (c) => {
+  const validDeviceTypes = ['ios', 'android'] as const;
+  type DeviceType = (typeof validDeviceTypes)[number];
+  const transformedValidDeviceTypes = { ios: 'ios', android: 'android' } as const satisfies Record<DeviceType, string>;
+  type DeviceTypeTransformed = (typeof transformedValidDeviceTypes)[DeviceType];
+
+  const stickerId: number = parseInt(c.req.param('stickerId') || '-1');
+  const deviceType: DeviceType = (c.req.query('device_type') || 'ios') as DeviceType;
+  const isStaticFlag: boolean = c.req.query('is_static') === 'true' || false;
+  const variantSize: number = parseInt(c.req.query('size') || '2');
+
+  if (stickerId === -1) return c.text('Invalid stickerId', 400);
+  if (!validDeviceTypes.includes(deviceType as DeviceType)) return c.text('Invalid device_type', 400);
+  if (variantSize > 2 || variantSize < 1) return c.text('Invalid size', 400);
+  if (deviceType === 'android' && variantSize === 2) return c.text('Invalid device_type or size', 400);
+
+  try {
+    const imageResponse = await ky(
+      `https://stickershop.line-scdn.net/stickershop/v1/sticker/${stickerId}/${deviceType}/sticker${
+        isStaticFlag ? '' : '_animation'
+      }${variantSize === 2 ? '@2x' : ''}.png`,
+      {
+        headers: { 'User-Agent': config.userAgent.lineIos },
+        timeout: requestTimeout,
+      },
+    );
+    const soundResponse = await ky(
+      `https://stickershop.line-scdn.net/stickershop/v1/sticker/${stickerId}/${transformedValidDeviceTypes[deviceType]}/sticker_sound.m4a`,
+      {
+        headers: { 'User-Agent': config.userAgent.lineIos },
+        timeout: requestTimeout,
+      },
+    );
+
+    const randomHash = Math.random().toString(36).substring(2);
+    const inputImagePath = `tmp_${randomHash}_input.png`;
+    const inputSoundPath = `tmp_${randomHash}_input.m4a`;
+    const outputPath = `tmp_${randomHash}_output.mp4`;
+
+    await fs.promises.writeFile(inputImagePath, Buffer.from(await imageResponse.arrayBuffer()));
+    await fs.promises.writeFile(inputSoundPath, Buffer.from(await soundResponse.arrayBuffer()));
+
+    await new Promise<void>((resolve, reject) => {
+      exec(
+        `ffmpeg -loglevel warning ${
+          isStaticFlag ? '-loop 1 ' : ''
+        }-i ${inputImagePath} -i ${inputSoundPath} -map 0:v:0 -map 1:a:0 -filter_complex "[0]scale=iw:ih,split[bg][fg];[bg]drawbox=c=black:t=fill[bg2];[bg2][fg]overlay=0:0:format=auto,format=yuv420p" -c:v libx264 -preset medium -pix_fmt yuv420p ${
+          isStaticFlag ? '-r 4 ' : ''
+        }-c:a copy ${isStaticFlag ? '-shortest ' : ''}-movflags +faststart ${outputPath}`,
+        (error) => {
+          if (error) reject(error);
+          else resolve();
+        },
+      );
+    });
+
+    const outputBuffer = await fs.promises.readFile(outputPath);
+    for (const filePath of [inputImagePath, inputSoundPath, outputPath]) await fs.promises.unlink(filePath);
+
+    const filteredHeaders = new Headers();
+    filteredHeaders.set('Content-Type', 'video/mp4');
+    filteredHeaders.set('X-Origin-Date', imageResponse.headers.get('Date')!);
+
+    return new Response(outputBuffer, {
+      status: 200,
+      headers: filteredHeaders,
+    });
+  } catch (error) {
+    if ((error as any).response?.status === 404) {
+      return c.text('Not Found', 404);
+    }
+    logger.error('MP4 process failed', error);
+    return c.text('Internal Server Error', 500);
+  }
+});
+
 export default app;
